@@ -25,3 +25,26 @@ function! markdown#ToggleStatus()
   endif
 endfunction
 " }}}
+
+" {{{
+function! markdown#MoveFoldToFileEnd()
+
+  let line_number = line('.')
+
+  " move current line / fold to end of file
+  execute ".m $<cr>"
+  " or line_number."m $<cr>"
+  execute "normal! zM"
+  execute line_number
+
+  " restore fold-level instead of following just opening it:
+  if foldclosed(line('.')) > -1
+      execute "silent! normal ".foldlevel(line('.'))."zo"
+  endif
+  " execute "normal! zo"
+
+endfunction
+" }}}
+
+" vim:foldmethod=marker
+
