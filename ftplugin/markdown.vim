@@ -24,11 +24,16 @@ if !exists('g:markdown_enable_folding')
   let g:markdown_enable_folding = 0
 endif
 
+if !exists('g:wiki_dir')
+  let g:wiki_dir = '~/wiki/'
+endif
 
+if !exists('g:blog_dir')
+  let g:blog_dir =  '~/blog/'
+endif
 
 let g:vimwiki_rxPreStart = '```'
 let g:vimwiki_rxPreEnd = '```'
-
 
 " Switch status of things
 execute 'nnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :call markdown#ToggleStatus()<CR>'
@@ -48,12 +53,15 @@ endif
 " --------------------------------------------------
 " {{{ OPTIONS
 " --------------------------------------------------
-
-setlocal comments+=b:*,b:-,b:+,n:>,se:``` commentstring=>\ %s
-setlocal formatoptions=tron
+setlocal autoindent
+setl formatoptions=tcroqn2
+setlocal comments=b:*,b:-,b:+,b:>,n:>,se:``` commentstring=>\ %s
+setl wrap linebreak nolist
+setl breakindent
+setl textwidth=0
+setl wrapmargin=0 " only used when textwidth=0
 setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\\|^\\s*[+-\\*]\\s\\+
 setlocal nolisp
-setlocal autoindent
 
 " Enable spelling and completion based on dictionary words
 " if &spelllang !~# '^\s*$' && g:markdown_enable_spell_checking

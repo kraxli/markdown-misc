@@ -34,11 +34,26 @@ function! fold#FoldLevelOfLine(lnum)
     return '>' . header_level
   endif
 
-  " === Folding ===
+
   let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
   let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
   let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
+  " === Folding Math ===
+  if next_line_syntax_group =~ 'texMathZone'
+    return 'a1'
+  endif
+
+  if current_line_syntax_group =~ 'texMathZone'
+    return '='
+  endif
+
+  if prev_line_syntax_group =~ 'texMathZone' && currentline !~ 'texMathZone'
+    return 's1'
+  endif
+
+
+  " === Folding Code ===
   if current_line_syntax_group ==# 'mkdCodeStart'
     return 'a1'
   endif
