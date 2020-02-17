@@ -4,9 +4,6 @@
 function! fold#FoldLevelOfLine(lnum)
   let currentline = getline(a:lnum)
   let nextline = getline(a:lnum + 1)
-  let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
-  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
-  let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
 
   " an empty line is not going to change the indentation level
@@ -38,6 +35,9 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   " === Folding ===
+  let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
+  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
+  let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
   if current_line_syntax_group ==# 'mkdCodeStart'
     return 'a1'
@@ -54,7 +54,7 @@ function! fold#FoldLevelOfLine(lnum)
 
   " folding fenced code blocks
   if match(currentline, '^\s*```') >= 0
-    if next_line_syntax_group ==# 'markdownFencedCodeBlock' || next_line_syntax_group ==# 'mkdCode' || next_line_syntax_group =~ 'mkdSnippet'
+    if next_line_syntax_group ==# 'markdownFencedCodeBlock' || next_line_syntax_group =~ 'mkdCode' || next_line_syntax_group =~ 'mkdSnippet'
       return 'a1'
     endif
     return 's1'
