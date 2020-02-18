@@ -36,9 +36,24 @@ let g:vimwiki_rxPreStart = '```'
 let g:vimwiki_rxPreEnd = '```'
 
 " Switch status of things
-execute 'nnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :call markdown#ToggleStatus()<CR>'
+" TODO allow for ranges
+" command! -buffer -range ToggleStatus call markdown#ToggleStatus()
+command! ToggleStatus call markdown#ToggleStatus()
 
-execute 'nnoremap <silent> <buffer> ' . g:markdown_wiki_index_key . ' :e ' . g:wiki_dir . ' index.md<CR>'
+augroup markdown_cmd
+	autocmd!
+  if !hasmapto('ToggleStatus')
+    " TODO let filetype list be determined by the user via a variable
+    au Filetype markdown,text
+      \ execute 'nnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :ToggleStatus<cr>'
+      \ execute 'vnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :ToggleStatus<cr>'
+      "\ execute 'nnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :call markdown#ToggleStatus()<CR>'
+  endif
 
-execute 'nnoremap <silent> <buffer> ' . g:markdown_blog_index_key . ' :e ' . g:blog_dir . ' index.md<CR>'
+    au Filetype markdown,text
+      \ execute 'nnoremap <silent> <buffer> ' . g:markdown_wiki_index_key . ' :e ' . g:wiki_dir . ' index.md<CR>'
 
+    au Filetype markdown,text
+      \ execute 'nnoremap <silent> <buffer> ' . g:markdown_blog_index_key . ' :e ' . g:blog_dir . ' index.md<CR>'
+
+augroup END
