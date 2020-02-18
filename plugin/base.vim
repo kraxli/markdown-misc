@@ -46,7 +46,7 @@ augroup markdown_cmd
     " TODO let filetype list be determined by the user via a variable
     au Filetype markdown,text
       \ execute 'nnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :ToggleStatus<cr>'
-      \ execute 'vnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :ToggleStatus<cr>'
+      \ | execute 'vnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :ToggleStatus<cr>'
       "\ execute 'nnoremap <silent> <buffer> ' . g:markdown_mapping_switch_status . ' :call markdown#ToggleStatus()<CR>'
   endif
 
