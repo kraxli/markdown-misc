@@ -1,4 +1,8 @@
 
+" indent('.') / indent(line(.))
+" synIDattr(synID(line('.'), 1, 1), 'name')
+" foldlevel('.') / foldlevel(line('.'))
+
 " {{{ FOLDING
 
 function! fold#FoldLevelOfLine(lnum)
@@ -40,15 +44,28 @@ function! fold#FoldLevelOfLine(lnum)
   let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
   " === Folding Math ===
-  if next_line_syntax_group =~ 'texMathZone'
+  if current_line_syntax_group =~ 'texMathZone' && prev_line_syntax_group !~ 'texMathZone'
     return 'a1'
   endif
 
-  if current_line_syntax_group =~ 'texMathZone'
+  if next_line_syntax_group =~ 'texMathZone'
     return '='
   endif
 
   if prev_line_syntax_group =~ 'texMathZone' && currentline !~ 'texMathZone'
+    return 's1'
+  endif
+
+  " === Folding HTML comments ===
+  if current_line_syntax_group =~ 'htmlComment' && prev_line_syntax_group !~ 'htmlComment'
+    return 'a1'
+  endif
+
+  if next_line_syntax_group =~ 'htmlComment'
+    return '='
+  endif
+
+  if prev_line_syntax_group =~ 'htmlComment' && currentline !~ 'htmlComment'
     return 's1'
   endif
 
