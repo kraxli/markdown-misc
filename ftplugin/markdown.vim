@@ -28,7 +28,6 @@ setlocal nolisp
 
 " Custom dictionary for emoji
 execute 'setlocal dictionary+=' . shellescape(expand('<sfile>:p:h:h')) . '/dict/emoticons.dict'
-setlocal iskeyword+=:,+,-
 setlocal complete+=k
 
 " " if g:markdown_enable_input_abbreviations
