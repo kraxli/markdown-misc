@@ -2,47 +2,71 @@
 " indent('.') / indent(line(.))
 " synIDattr(synID(line('.'), 1, 1), 'name')
 " foldlevel('.') / foldlevel(line('.'))
+" help: http://vimdoc.sourceforge.net/htmldoc/fold.html#folds
 
 " {{{ FOLDING
 
 function! fold#FoldLevelOfLine(lnum)
   let currentline = getline(a:lnum)
   let nextline = getline(a:lnum + 1)
+  let prevline =  getline(a:lnum - 1)
 
+  let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
+  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
+  let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
   " an empty line is not going to change the indentation level
   if match(currentline, '^\s*$') >= 0
     return '='
   endif
 
-  " folding lists
-  if s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
-    if s:SyntaxGroupOfLineIs(a:lnum - 1, '^markdownListItem')
-      return 'a1'
-    endif
-    if s:SyntaxGroupOfLineIs(a:lnum + 1, '^markdownListItem')
-      return 's1'
-    endif
+  " ---------- Folding Lists -----------
+  " " folding lists (from gabriel/vim-markdown)
+  " if s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
+  "   if s:SyntaxGroupOfLineIs(a:lnum - 1, '^markdownListItem')
+  "     return 'a1'
+  "   endif
+  "   if s:SyntaxGroupOfLineIs(a:lnum + 1, '^markdownListItem')
+  "     return 's1'
+  "   endif
+  "   return '='
+  " endif
+  "
+  " " we are not going to fold things inside list items, too hairy
+  " let is_inside_a_list_item = s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
+  " if is_inside_a_list_item
+  "   return '='
+  " endif
+
+  if current_line_syntax_group =~ 'mkdListItem' && prev_line_syntax_group !~ 'mkdListItem'
     return '='
   endif
 
-  " we are not going to fold things inside list items, too hairy
-  let is_inside_a_list_item = s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
-  if is_inside_a_list_item
-    return '='
+  if current_line_syntax_group =~ 'mkdListItem' " && next_line_syntax_group =~ 'mkdListItem'
+    let current_line_indent = indent(a:lnum)
+    let tabstop = &tabstop
+
+    if current_line_indent > indent(a:lnum+1)
+      return 's1' " . string(current_line_indent/tabstop)
+    endif
+
+    if current_line_indent > indent(a:lnum-1)
+      return 'a1' " . string(current_line_indent/tabstop)
+    endif
+
   endif
 
-  " folding atx headers
+    " ------- folding atx headers ------
   if match(currentline, '^#\{1,6}\s') >= 0
     let header_level = strlen(substitute(currentline, '^\(#\{1,6}\).*', '\1', ''))
     return '>' . header_level
   endif
 
 
-  let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
-  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
-  let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
-
+  " let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
+  " let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
+  " let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
+  "
   " === Folding Math ===
   if current_line_syntax_group =~ 'texMathZone' && prev_line_syntax_group !~ 'texMathZone'
     return 'a1'
