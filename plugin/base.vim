@@ -39,6 +39,7 @@ let g:vimwiki_rxPreEnd = '```'
 " TODO allow for ranges
 " command! -buffer -range ToggleStatus call markdown#ToggleStatus()
 command! ToggleStatus call markdown#ToggleStatus()
+command! TasksOpen call tools#unfold_open_tasks()
 
 augroup markdown_cmd
 	autocmd!
