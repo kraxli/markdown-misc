@@ -1,6 +1,9 @@
 
 # Variables
 
+Depends: 
+    - embear/vim-foldsearch (for unfolding open tasks)
+
 In case you have a directory for your wiki and blog files in markdown then you can set
 ```vim
     let g:wiki_dir = '~/Dropbox/PKD/vimwiki/'
