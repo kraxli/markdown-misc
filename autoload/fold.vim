@@ -44,14 +44,25 @@ function! fold#FoldLevelOfLine(lnum)
 
   if current_line_syntax_group =~ 'mkdListItem' " && next_line_syntax_group =~ 'mkdListItem'
     let current_line_indent = indent(a:lnum)
-    let tabstop = &tabstop
 
-    if current_line_indent > indent(a:lnum+1)
-      return 's1' " . string(current_line_indent/tabstop)
+    let indent_diff_next_line = current_line_indent - indent(a:lnum+1)
+    if indent_diff_next_line > 0
+      let reduce_indent_level = indent_diff_next_line/&shiftwidth
+      if reduce_indent_level < 1
+        let reduce_indent_level = 1
+      end
+
+      return 's' . reduce_indent_level " s1, s2, ... applies to next line
     endif
 
-    if current_line_indent > indent(a:lnum-1)
-      return 'a1' " . string(current_line_indent/tabstop)
+    let indent_diff_prev_line = current_line_indent - indent(a:lnum-1)
+    if indent_diff_prev_line > 0
+      let increase_indent_level = indent_diff_prev_line/&shiftwidth
+      if increase_indent_level < 1
+        let increase_indent_level = 1
+      end
+
+      return 'a' . increase_indent_level
     endif
 
   endif
