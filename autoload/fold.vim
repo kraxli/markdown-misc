@@ -14,7 +14,7 @@ function! fold#FoldLevelOfLine(lnum)
   let prevline =  getline(a:lnum - 1)
 
   let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
-  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
+  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')  " s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
   let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
   " an empty line is not going to change the indentation level
