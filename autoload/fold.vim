@@ -2,7 +2,9 @@
 " indent('.') / indent(line(.))
 " synIDattr(synID(line('.'), 1, 1), 'name')
 " foldlevel('.') / foldlevel(line('.'))
-" help: http://vimdoc.sourceforge.net/htmldoc/fold.html#folds
+" help:
+"   http://vimdoc.sourceforge.net/htmldoc/fold.html#folds
+"   http://vimdoc.sourceforge.net/htmldoc/usr_41.html
 
 " {{{ FOLDING
 
@@ -47,7 +49,7 @@ function! fold#FoldLevelOfLine(lnum)
 
     let indent_diff_next_line = current_line_indent - indent(a:lnum+1)
     if indent_diff_next_line > 0
-      let reduce_indent_level = indent_diff_next_line/&shiftwidth " float2nr(floor())
+      let reduce_indent_level = float2nr(indent_diff_next_line/&shiftwidth) " float2nr(floor())
       " if reduce_indent_level < 1
       "   let reduce_indent_level = 1
       " end
@@ -57,7 +59,7 @@ function! fold#FoldLevelOfLine(lnum)
 
     let indent_diff_prev_line = current_line_indent - indent(a:lnum-1)
     if indent_diff_prev_line > 0
-      let increase_indent_level = indent_diff_prev_line/&shiftwidth " float2nr(floor())
+      let increase_indent_level = float2nr(indent_diff_prev_line/&shiftwidth) " float2nr(floor())
       " if increase_indent_level < 1
       "   let increase_indent_level = 1
       " end
