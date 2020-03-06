@@ -1,4 +1,5 @@
 
+
 function tools#unfold_open_tasks()
   " execute "normal! zM"
   " execute "g/^\\s*[-+\\*]\\{1}\\s\\[\\s\\]/normal! zv"
@@ -6,4 +7,7 @@ function tools#unfold_open_tasks()
 
   execute "Fp ^\\s*[-+\\*]\\{1}\\s\\[\\s\\]"
 endfunction
+
+
+
 

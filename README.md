@@ -14,3 +14,16 @@ These directories are required in case you want to open the correponing index fi
     let g:markdown_wiki_index_key = '<leader>W'
     let g:markdown_blog_index_key = '<leader>B'
 ```
+
+# Functions
+
+ToggleStatus
+TasksOpen
+TasksOpenHi
+
+# Default mappings
+
+nmap <silent> th :TaksOpenHi<cr>
+nmap <silent> to :TasksOpen<cr>
+
+
