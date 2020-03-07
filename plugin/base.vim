@@ -32,20 +32,17 @@ if !exists('g:blog_dir')
   let g:blog_dir =  '~/blog/'
 endif
 
-let g:vimwiki_rxPreStart = '```'
-let g:vimwiki_rxPreEnd = '```'
 
 " Switch status of things
 " TODO allow for ranges
 " command! -buffer -range ToggleStatus call markdown#ToggleStatus()
 command! ToggleStatus call markdown#ToggleStatus()
 command! TasksOpen call tools#unfold_open_tasks()
-" command! TasksOpenHi silent :let @/='-\s\[\s\].*$'|set hls
 command! TasksOpenHi silent :let @/='^\s*-\s\[\s\]'|set hls
 
 
 augroup markdown_cmd
-	autocmd!
+  autocmd!
   if !hasmapto('ToggleStatus')
     " TODO let filetype list be determined by the user via a variable
     au Filetype markdown,text
@@ -55,7 +52,7 @@ augroup markdown_cmd
   endif
 
   if !hasmapto('TaksOpenHi')
-    nmap <silent> th :TaksOpenHi<cr>
+    nmap <silent> th :TasksOpenHi<cr>
   endif
 
   if !hasmapto('TasksOpen')

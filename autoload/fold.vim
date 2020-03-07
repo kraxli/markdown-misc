@@ -45,24 +45,24 @@ function! fold#FoldLevelOfLine(lnum)
   if current_line_syntax_group =~ 'mkdListItem' " && next_line_syntax_group =~ 'mkdListItem'
     let current_line_indent = indent(a:lnum)
 
+    " let indent_diff_prev_line = current_line_indent - indent(a:lnum-1)
     let indent_diff_next_line = current_line_indent - indent(a:lnum+1)
-    if indent_diff_next_line > 0
-      let reduce_indent_level = indent_diff_next_line/&shiftwidth " float2nr(floor())
+    let indent_level_change = indent_diff_next_line/&shiftwidth " float2nr(floor())
+    if indent_diff_next_line == 0
+      return '='
+
+    elseif indent_diff_next_line > 0
       " if reduce_indent_level < 1
       "   let reduce_indent_level = 1
       " end
+      return 's' . indent_level_change " s1, s2, ... applies to next line
 
-      return 's' . reduce_indent_level " s1, s2, ... applies to next line
-    endif
-
-    let indent_diff_prev_line = current_line_indent - indent(a:lnum-1)
-    if indent_diff_prev_line > 0
-      let increase_indent_level = indent_diff_prev_line/&shiftwidth " float2nr(floor())
+    elseif indent_diff_next_line < 0
+      " let increase_indent_level = indent_diff_next_line/&shiftwidth " float2nr(floor())
       " if increase_indent_level < 1
       "   let increase_indent_level = 1
       " end
-
-      return 'a' . increase_indent_level
+      return 'a' . indent_level_change
     endif
 
   endif
@@ -103,7 +103,6 @@ function! fold#FoldLevelOfLine(lnum)
   if prev_line_syntax_group =~ 'htmlComment' && currentline !~ 'htmlComment'
     return 's1'
   endif
-
 
   " === Folding Code ===
   if current_line_syntax_group ==# 'mkdCodeStart'
