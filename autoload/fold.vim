@@ -11,141 +11,79 @@
 let s:pattern_header = '^#\{1,6}\s'
 
 function! fold#FoldLevelOfLine(lnum)
-  let currentline = getline(a:lnum)
-  let nextline = getline(a:lnum + 1)
-  let prevline =  getline(a:lnum - 1)
 
-  let prev_line_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
-  let current_line_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')  " s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
-  let next_line_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
+   " stop if file has one line only
+  if line('$') <= 1
+    return -1
+  endif
+
+  let cur_line = getline(a:lnum)
+  let nxt_line = getline(a:lnum + 1)
+  let prv_line =  getline(a:lnum - 1)
+
+  let prv_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
+  let cur_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')  " s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
+  let nxt_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
   " an empty line is not going to change the indentation level
-  if match(currentline, '^\s*$') >= 0
+  if match(cur_line, '^\s*$') >= 0
     return '='
   endif
 
   " ------- folding atx headers ------
-  if match(currentline, s:pattern_header) >= 0
-    let header_level = strlen(substitute(currentline, '^\(#\{1,6}\).*', '\1', ''))
+  if match(cur_line, s:pattern_header) >= 0
+    let header_level = strlen(substitute(cur_line, '^\(#\{1,6}\).*', '\1', ''))
     return '>' . header_level
   endif
 
 
   " ---------- Folding Lists -----------
-  " " folding lists (from gabriel/vim-markdown)
-  " if s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
-  "   if s:SyntaxGroupOfLineIs(a:lnum - 1, '^markdownListItem')
-  "     return 'a1'
-  "   endif
-  "   if s:SyntaxGroupOfLineIs(a:lnum + 1, '^markdownListItem')
-  "     return 's1'
-  "   endif
-  "   return '='
-  " endif
-  "
-  " " we are not going to fold things inside list items, too hairy
-  " let is_inside_a_list_item = s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
-  " if is_inside_a_list_item
-  "   return '='
-  " endif
-
-  if current_line_syntax_group =~? 'mkdListItem'
+  if cur_syntax_group =~? 'mkdListItem'
 
     let cur_indent = indent(a:lnum)
 
     " initial list indent level / each new list starts after an empty line
     " or a header (consistent with pandoc)
-    if match(prevline, '^\s*$') >= 0 || match(prevline, s:pattern_header)>=0
+    if match(prv_line, '^\s*$') >= 0 || match(prv_line, s:pattern_header)>=0
       let s:list_indent_ini = cur_indent
       let s:list_foldlevel_ini = foldlevel(a:lnum-1)
-      " return '='
     endif
 
-    " let prv_foldlevel = foldlevel(a:lnum-1)
     let cur_foldlevel = s:list_foldlevel_ini + (cur_indent - s:list_indent_ini)/&shiftwidth
-    " let nxt_foldlevel = s:list_foldlevel_ini + (indent(a:lnum+1) - s:list_indent_ini)/&shiftwidth
-
-    " TODO delete:
-    let g:list_foldlevel_ini = s:list_foldlevel_ini
-    let g:nxt_foldlevel = nxt_foldlevel
-    let g:list_indent_ini = s:list_indent_ini
 
     return '>' . (cur_foldlevel + 1)
 
-    " if prv_foldlevel < cur_foldlevel
-    "   return '>' . (cur_foldlevel - prv_foldlevel)
-    " elseif nxt_foldlevel < cur_foldlevel
-    "   return '>' . (cur_foldlevel - nxt_foldlevel)
-    " " elseif 
-    "   " return '='
-    " endif
-
-    " return '>' . cur_foldlevel
-
-    " " if next_line_indent > s:list_indent_ini
-    "   " return s:list_foldlevel_ini
-    " if next_line_indent > cur_indent
-    "   return 'a1'
-    "   " return '>' . (prv_foldlevel+1)
-    " elseif prev_line_indent > cur_indent
-    "   return 's' " . (prv_foldlevel-1)
-    "   "  (s:list_foldlevel_ini + ((cur_indent-s:list_indent_ini)/&shiftwidth) )
-    " elseif cur_indent == s:list_indent_ini
-    "   return s:list_foldlevel_ini
-    " " elseif prev_line_indent == cur_indent
-    " " else
-    "   " return '='
-    " endif
-    "
-    " let prev_line_indent = indent(a:lnum-1)
-    " let next_line_indent = indent(a:lnum+1)
-
-    " let indent_diff_2ini = cur_indent - s:list_indent_ini
-    " let indent_level_change = indent_diff_2ini/&shiftwidth  " float2nr(floor())
-    "
-    "
-    " if indent_diff_2ini > 0
-    "   " return 'a' . indent_level_change " string()
-    "   return '>' . (s:list_foldlevel_ini + indent_level_change)
-    " " elseif indent_diff_2ini < 0
-    " "   " return 's' . indent_level_change " s1, s2, ... applies to next line
-    " "   return '>' .
-    " else
-    "   return '='
-    " endif
-
-    return '='
   endif
 
   " === Folding Code ===
-  if current_line_syntax_group =~ 'mkdCodeStart'
+  if cur_syntax_group =~ 'mkdCodeStart'
     return 'a1'
   endif
 
-  " if prev_line_syntax_group ==# 'mkdCodeEnd'
-  if current_line_syntax_group =~ 'mkdCodeEnd'
+  " if prv_syntax_group ==# 'mkdCodeEnd'
+  if cur_syntax_group =~ 'mkdCodeEnd'
     return 's1'
   endif
 
-  if current_line_syntax_group =~ 'mkdSnippet'
+  if cur_syntax_group =~ 'mkdSnippet'
     return '='
   endif
 
   " folding fenced code blocks
-  if match(currentline, '^\s*```') >= 0
-    if next_line_syntax_group ==? 'markdownFencedCodeBlock' || next_line_syntax_group =~? 'mkdCode' || next_line_syntax_group =~? 'mkdSnippet'
+  if match(cur_line, '^\s*```') >= 0
+    if nxt_syntax_group ==? 'markdownFencedCodeBlock' || nxt_syntax_group =~? 'mkdCode' || nxt_syntax_group =~? 'mkdSnippet'
       return 'a1'
     endif
     return 's1'
   endif
 
   " folding code blocks
-  if match(currentline, '^\s\{4,}') >= 0
-    if current_line_syntax_group ==? 'markdownCodeBlock'
-      if prev_line_syntax_group !=? 'markdownCodeBlock'
+  if match(cur_line, '^\s\{4,}') >= 0
+    if cur_syntax_group ==? 'markdownCodeBlock'
+      if prv_syntax_group !=? 'markdownCodeBlock'
         return 'a1'
       endif
-      if next_line_syntax_group !=? 'markdownCodeBlock'
+      if nxt_syntax_group !=? 'markdownCodeBlock'
         return 's1'
       endif
     endif
@@ -153,37 +91,37 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   " === Folding Math ===
-  if current_line_syntax_group =~? 'texMathZone' && prev_line_syntax_group !~? 'texMathZone'
+  if cur_syntax_group =~? 'texMathZone' && prv_syntax_group !~? 'texMathZone'
     return 'a1'
   endif
 
-  if next_line_syntax_group =~? 'texMathZone'
+  if nxt_syntax_group =~? 'texMathZone'
     return '='
   endif
 
-  if prev_line_syntax_group =~? 'texMathZone' && currentline !~? 'texMathZone'
+  if prv_syntax_group =~? 'texMathZone' && cur_line !~? 'texMathZone'
     return 's1'
   endif
 
   " === Folding HTML comments ===
-  if current_line_syntax_group =~? 'htmlComment' && prev_line_syntax_group !~? 'htmlComment'
+  if cur_syntax_group =~? 'htmlComment' && prv_syntax_group !~? 'htmlComment'
     return 'a1'
   endif
 
-  if next_line_syntax_group =~? 'htmlComment'
+  if nxt_syntax_group =~? 'htmlComment'
     return '='
   endif
 
-  if prev_line_syntax_group =~? 'htmlComment' && currentline !~? 'htmlComment'
+  if prv_syntax_group =~? 'htmlComment' && cur_line !~? 'htmlComment'
     return 's1'
   endif
 
   " folding setex headers
-  if (match(currentline, '^.*$') >= 0)
-    if (match(nextline, '^=\+$') >= 0)
+  if (match(cur_line, '^.*$') >= 0)
+    if (match(nxt_line, '^=\+$') >= 0)
       return '>1'
     endif
-    if (match(nextline, '^-\+$') >= 0)
+    if (match(nxt_line, '^-\+$') >= 0)
       return '>2'
     endif
   endif
