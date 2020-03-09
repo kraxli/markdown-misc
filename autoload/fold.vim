@@ -60,7 +60,6 @@ function! fold#FoldLevelOfLine(lnum)
     return 'a1'
   endif
 
-  " if prv_syntax_group ==# 'mkdCodeEnd'
   if cur_syntax_group =~ 'mkdCodeEnd'
     return 's1'
   endif
@@ -91,16 +90,16 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   " === Folding Math ===
-  if cur_syntax_group =~? 'texMathZone' && prv_syntax_group !~? 'texMathZone'
+  if cur_syntax_group =~? 'texMathZone' && prv_syntax_group !~? 'texMathZone' && nxt_syntax_group =~? 'texMathZone'
     return 'a1'
   endif
 
-  if nxt_syntax_group =~? 'texMathZone'
-    return '='
+  if cur_syntax_group =~? 'texMathZone' && nxt_syntax_group !~? 'texMathZone'
+    return 's1'
   endif
 
-  if prv_syntax_group =~? 'texMathZone' && cur_line !~? 'texMathZone'
-    return 's1'
+  if cur_syntax_group =~? 'texMathZone'
+    return '='
   endif
 
   " === Folding HTML comments ===
@@ -127,6 +126,7 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   return '='
+
 endfunction
 
 function! s:SyntaxGroupOfLineIs(lnum, pattern)
