@@ -22,21 +22,46 @@ function! fold#FoldLevelOfLine(lnum)
   let prv_line =  getline(a:lnum - 1)
 
   let prv_syntax_group = synIDattr(synID(a:lnum - 1, 1, 1), 'name')
-  let cur_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')
+  let cur_syntax_group = synIDattr(synID(a:lnum, 1, 1), 'name')  " s:SyntaxGroupOfLineIs(a:lnum, '^markdownListItem')
   let nxt_syntax_group = synIDattr(synID(a:lnum + 1, 1, 1), 'name')
 
 
   " ------- folding atx headers ------
   if match(cur_line, s:header_pattern) >= 0
     let s:header_level = strlen(substitute(cur_line, '^\(#\{1,6}\).*', '\1', ''))
-    let g:header_level = s:header_level
     return '>' . s:header_level
   endif
 
   " ------- empty line -------
   if match(cur_line, '^\s*$') >= 0
+    " if prv_syntax_group =~? 'mkdListItem'
+    "   return '>' . (s:header_level + 1)
+    " elseif  match(nxt_line, s:header_pattern) >= 0
+    "   return '>' . (strlen(substitute(cur_line, '^\(#\{1,6}\).*', '\1', '')) - 1)
+    " else
+    "   return '='
+    " endif
+
+    " return '>' . foldlevel(a:lnum-1)
+    " let [s:prv_header_lnum, s:prv_header_line] = s:find_pattern_backw(s:header_pattern, a:lnum)
+    " let s:prv_header_fold = foldlevel(s:prv_header_lnum)
+    " return '>' . s:prv_header_fold " s:header_level
     return '-1'
   endif
+
+  " if cur_syntax_group =~? 'mkdNonListItem'
+  "   let [s:prv_header_lnum, s:prv_header_line] = s:find_pattern_backw(s:header_pattern, a:lnum)
+  "   let s:prv_header_fold = foldlevel(s:prv_header_lnum)
+  "   let s:prv_foldlevel = foldlevel(a:lnum-1)
+  "
+  "   let cur_foldlevel_delta = s:prv_foldlevel - s:prv_header_fold
+  "
+  "   if cur_foldlevel_delta == 0
+  "     return '='
+  "   else
+  "     return 's' . (cur_foldlevel_delta - 1)
+  "   endif
+  " endif
 
   " ---------- Folding Lists -----------
   if cur_syntax_group =~? 'mkdListItem' && g:markdown_list_folding == 1
@@ -44,21 +69,40 @@ function! fold#FoldLevelOfLine(lnum)
     let prv_indent = indent(a:lnum-1)
     let cur_indent = indent(a:lnum)
     let nxt_indent = indent(a:lnum+1)
-    let prv_fold = foldlevel(a:lnum-1)
 
     " initial list indent level / each new list starts after an empty line
     " or a header (consistent with pandoc)
     if match(prv_line, '^\s*$') >= 0 || match(prv_line, s:header_pattern) >= 0
+      return '='
+      " let prv_line = getline(line('.')-1) | match(prv_line, '^\s*$') >= 0 || match(prv_line, '^#\{1,6}\s') >= 0
 
-      let g:list_ini_indent = cur_indent
-      let g:list_ini_fold =  (g:header_level + 1)
-      return '>' . g:list_ini_fold
+      " if match(prv_line, s:header_pattern) >= 0
+      "   let s:prv_header_fold = foldlevel(a:lnum-1)
+      " else
+      "   let [s:prv_header_lnum, s:prv_header_line, s:prv_header_fold] = s:find_pattern_backw(s:header_pattern, a:lnum)
+      " endif
+      " let [s:a, s:prv_header_fold, s:b] = s:find_pattern_backw(s:header_pattern, a:lnum)
+      " let [s:prv_header_lnum, s:prv_header_fold, s:prv_header_line] = s:find_pattern_backw(s:header_pattern, a:lnum)
+
+      " let s:list_indent_ini = cur_indent
+      " let s:list_foldlevel_ini = (s:prv_header_fold + 1) " foldlevel(a:lnum-1)
+
+      " return '>' . (s:list_foldlevel_ini)
+      " return '>' . (s:prv_header_fold + 1)
     endif
 
     let cur_fold_diff = (cur_indent - prv_indent)/&shiftwidth
+    " let cur_foldlevel = s:list_foldlevel_ini + indent_diff/ + 1
     let nxt_fold_diff =  (nxt_indent - cur_indent)/&shiftwidth
+    let cur_fold = foldlevel('.')
 
-    return '>' . (g:list_ini_fold + (cur_indent-g:list_ini_indent)/&shiftwidth)
+    if cur_fold_diff == 0
+      return '='
+    elseif cur_fold_diff > 0
+      return 'a' . cur_fold_diff
+    elseif nxt_fold_diff < 0
+      return 's' . abs(nxt_fold_diff)
+    endif
 
   endif
 
@@ -149,16 +193,15 @@ function! s:find_pattern_backw(rx_item, lnum) "{{{
     let lnum -= 1
   endwhile
 
-  " let fold_lev = foldlevel(lnum)
-  " return [lnum, fold_lev, line]
+  let fold_lev = foldlevel(lnum)
 
-  return lnum
+  return [lnum, fold_lev, line]
 endfunction "}}}
 
 
-" function! FindPattern(rx_item, lnum)
-"   return s:find_pattern_backw(a:rx_item, a:lnum)
-" endfunction
+function! FindPattern(rx_item, lnum)
+  return s:find_pattern_backw(a:rx_item, a:lnum)
+endfunction
 
 
 function! s:SyntaxGroupOfLineIs(lnum, pattern)

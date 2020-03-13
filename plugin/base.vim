@@ -32,6 +32,9 @@ if !exists('g:blog_dir')
   let g:blog_dir =  '~/blog/'
 endif
 
+if !exists('g:markdown_list_folding')
+  let g:markdown_list_folding = 1
+endif
 
 " Switch status of things
 " TODO allow for ranges
