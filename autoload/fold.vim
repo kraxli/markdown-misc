@@ -34,14 +34,23 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   " ------- empty line -------
+  " if match(cur_line, '^\s*$') >=0 && !((nxt_syntax_group ==? 'markdownFencedCodeBlock' || nxt_syntax_group =~? 'mkdCode' || nxt_syntax_group =~? 'mkdSnippet') >= 0)
+  "   return '-1'
+  " endif
+
   if match(cur_line, '^\s*$') >= 0
-    return '='
-    " return '-1'
+      return (s:header_level)
+  endif
+
     " let prv_fold = foldlevel(a:lnum-1)
     " let nxt_fold = foldlevel(a:lnum+1)
     " " let nxt_fold = fold#FoldLevelOfLine(a:lnum+1)
-    " return min( [prv_fold, nxt_fold] )
-  endif
+    " let level = min([prv_fold, nxt_fold])
+    " return float2nr(level)
+
+    " if prv_syntax_group =~? 'mkdList' && exists('s:heaer_level')
+    "   return '>' . (s:header_level+1)
+    " else
 
   " ---------- Folding Lists -----------
   if cur_syntax_group =~? 'mkdListItem' && g:markdown_list_folding == 1
@@ -80,7 +89,6 @@ function! fold#FoldLevelOfLine(lnum)
   if match(cur_line, '^\s*```') >= 0
     if nxt_syntax_group ==? 'markdownFencedCodeBlock' || nxt_syntax_group =~? 'mkdCode' || nxt_syntax_group =~? 'mkdSnippet'
       return '> ' . (g:header_level + 1)
-      " return 'a1'
     endif
     return 's1'
   endif
@@ -137,6 +145,10 @@ function! fold#FoldLevelOfLine(lnum)
       return '>2'
     endif
   endif
+
+  " if match(cur_line, '^\s*$')
+  "   return '-1'
+  " endif
 
   return '='
 
