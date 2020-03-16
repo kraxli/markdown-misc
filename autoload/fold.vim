@@ -34,23 +34,9 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   " ------- empty line -------
-  " if match(cur_line, '^\s*$') >=0 && !((nxt_syntax_group ==? 'markdownFencedCodeBlock' || nxt_syntax_group =~? 'mkdCode' || nxt_syntax_group =~? 'mkdSnippet') >= 0)
-  "   return '-1'
-  " endif
-
   if match(cur_line, '^\s*$') >= 0
       return (s:header_level)
   endif
-
-    " let prv_fold = foldlevel(a:lnum-1)
-    " let nxt_fold = foldlevel(a:lnum+1)
-    " " let nxt_fold = fold#FoldLevelOfLine(a:lnum+1)
-    " let level = min([prv_fold, nxt_fold])
-    " return float2nr(level)
-
-    " if prv_syntax_group =~? 'mkdList' && exists('s:heaer_level')
-    "   return '>' . (s:header_level+1)
-    " else
 
   " ---------- Folding Lists -----------
   if cur_syntax_group =~? 'mkdListItem' && g:markdown_list_folding == 1
@@ -146,10 +132,6 @@ function! fold#FoldLevelOfLine(lnum)
     endif
   endif
 
-  " if match(cur_line, '^\s*$')
-  "   return '-1'
-  " endif
-
   return '='
 
 endfunction
@@ -173,11 +155,9 @@ function! s:find_pattern_backw(rx_item, lnum) "{{{
   return lnum
 endfunction "}}}
 
-
 " function! FindPattern(rx_item, lnum)
 "   return s:find_pattern_backw(a:rx_item, a:lnum)
 " endfunction
-
 
 function! s:SyntaxGroupOfLineIs(lnum, pattern)
   let stack = synstack(a:lnum, a:cnum)
