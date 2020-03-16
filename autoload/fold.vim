@@ -35,7 +35,12 @@ function! fold#FoldLevelOfLine(lnum)
 
   " ------- empty line -------
   if match(cur_line, '^\s*$') >= 0
-    return '-1'
+    return '='
+    " return '-1'
+    " let prv_fold = foldlevel(a:lnum-1)
+    " let nxt_fold = foldlevel(a:lnum+1)
+    " " let nxt_fold = fold#FoldLevelOfLine(a:lnum+1)
+    " return min( [prv_fold, nxt_fold] )
   endif
 
   " ---------- Folding Lists -----------
@@ -44,12 +49,10 @@ function! fold#FoldLevelOfLine(lnum)
     let prv_indent = indent(a:lnum-1)
     let cur_indent = indent(a:lnum)
     let nxt_indent = indent(a:lnum+1)
-    let prv_fold = foldlevel(a:lnum-1)
 
     " initial list indent level / each new list starts after an empty line
     " or a header (consistent with pandoc)
     if match(prv_line, '^\s*$') >= 0 || match(prv_line, s:header_pattern) >= 0
-
       let g:list_ini_indent = cur_indent
       let g:list_ini_fold =  (g:header_level + 1)
       return '>' . g:list_ini_fold
@@ -63,24 +66,27 @@ function! fold#FoldLevelOfLine(lnum)
   endif
 
   " === Folding Code ===
-  if cur_syntax_group =~ 'mkdCodeStart'
-    return 'a1'
-  endif
-
-  if cur_syntax_group =~ 'mkdCodeEnd'
-    return 's1'
-  endif
-
-  if cur_syntax_group =~ 'mkdSnippet'
-    return '='
-  endif
+  " if cur_syntax_group =~? 'mkdCodeStart'
+  "   " return 'a1'
+  "   return '> ' . (g:header_level + 1)
+  " endif
+  "
+  " if cur_syntax_group =~? 'mkdCodeEnd'
+  "   return 's1'
+  " endif
+  "
 
   " folding fenced code blocks
   if match(cur_line, '^\s*```') >= 0
     if nxt_syntax_group ==? 'markdownFencedCodeBlock' || nxt_syntax_group =~? 'mkdCode' || nxt_syntax_group =~? 'mkdSnippet'
-      return 'a1'
+      return '> ' . (g:header_level + 1)
+      " return 'a1'
     endif
     return 's1'
+  endif
+
+  if cur_syntax_group =~? 'mkdSnippet'
+    return '='
   endif
 
   " folding code blocks
