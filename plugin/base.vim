@@ -20,20 +20,12 @@ if !exists('g:markdown_rxListItem')
   let g:markdown_rxListItem = '^\s*[*-]\s'
 endif
 
-if !exists('g:markdown_enable_folding')
-  let g:markdown_enable_folding = 0
-endif
-
 if !exists('g:wiki_dir')
   let g:wiki_dir = '~/wiki/'
 endif
 
 if !exists('g:blog_dir')
   let g:blog_dir =  '~/blog/'
-endif
-
-if !exists('g:markdown_list_folding')
-  let g:markdown_list_folding = 1
 endif
 
 " Switch status of things
